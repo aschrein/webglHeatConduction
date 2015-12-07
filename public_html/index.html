@@ -135,7 +135,7 @@ function initGL()
 		gl.getExtension( 'OES_texture_float_linear' );
 		gl.viewportWidth = canvas.width;
 		gl.viewportHeight = canvas.height;
-		$( '#main_canvas' ).mousedown( function( e )
+		canvas.onclick = function( e )
 		{
 			var mouseX = e.pageX - this.offsetLeft;
 			var mouseY = e.pageY - this.offsetTop;
@@ -146,7 +146,7 @@ function initGL()
 				temperature_label.style.left = mouseX + 'px';
 				temperature_label.style.top = ( mouseY + 16 ) + 'px';
 			}
-		} );
+		};
 		gl.cur_shader = null;
 		gl.cur_buffer = null;
 		gl.bindTarget = function( buffer )
