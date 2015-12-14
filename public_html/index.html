@@ -23,7 +23,7 @@ and open the template in the editor.
 			{
 				float l = length( uv - 0.5 ) * 2.0;
 				float x = 10.0 * ( uv.y * uv.x - 0.5 );
-				gl_FragColor = vec4( 1000.0 * exp( -pow( abs( x ) , 2.0 ) ) , 0.0 , 0.0 , 1.0 );
+				gl_FragColor = vec4( 0.0 );//1000.0 * exp( -pow( abs( x ) , 2.0 ) ) , 0.0 , 0.0 , 1.0 );
 			}
 		</script>
 		<script id="border_frag" type="x-shader/x-fragment">
