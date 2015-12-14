@@ -9,15 +9,21 @@ and open the template in the editor.
 		<title>TODO supply a title</title>
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<script src="http://code.jquery.com/jquery-2.1.4.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.14.3/react.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.14.3/react-dom.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.23/browser.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+		<link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.3/css/materialize.min.css">
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.3/js/materialize.min.js"></script>
 		<script id="fill_frag" type="x-shader/x-fragment">
 			precision highp float;
 			varying vec2 uv;
 			void main()
 			{
-			float l = length( uv - 0.5 ) * 2.0;
-			float x = 10.0 * ( uv.y * uv.x - 0.5 );
-			gl_FragColor = vec4( 1000.0 * exp( -pow( abs( x ) , 2.0 ) ) , 0.0 , 0.0 , 1.0 );
+				float l = length( uv - 0.5 ) * 2.0;
+				float x = 10.0 * ( uv.y * uv.x - 0.5 );
+				gl_FragColor = vec4( 1000.0 * exp( -pow( abs( x ) , 2.0 ) ) , 0.0 , 0.0 , 1.0 );
 			}
 		</script>
 		<script id="border_frag" type="x-shader/x-fragment">
@@ -28,10 +34,12 @@ and open the template in the editor.
 			void main()
 			{
 				vec2 border_width = vec2( 1.0 ) / viewport_size;
-				bool b = 0.5 - abs( uv.x - 0.5 ) < border_width.x || 0.5 - abs( uv.y - 0.5 ) < border_width.y;
+				vec2 tx = uv - 0.5;
+				bool b = length( tx ) > 0.4;//0.5 - abs( uv.x - 0.5 ) <= border_width.x || 0.5 - abs( uv.y - 0.5 ) <= border_width.y;
+				
 				if( b )
 				{
-					gl_FragColor = vec4( 0.0 , 0.0 , 0.0 , 1.0 );
+					gl_FragColor = vec4( 500.0 * ( 1.0 + cos( atan( tx.y , tx.x ) ) ) , 0.0 , 0.0 , 1.0 );
 				} else
 				{
 					gl_FragColor = texture2D( texture , uv );
@@ -58,17 +66,17 @@ and open the template in the editor.
 			vec2 gradT( vec2 p )
 			{
 				return vec2( getT( p + vec2( 1.0 , 0.0 ) ) - getT( p + vec2( -1.0 , 0.0 ) ) ,
-					getT( p + vec2( 0.0 , 1.0 ) ) - getT( p + vec2( 0.0 , -1.0 ) ) );
+				getT( p + vec2( 0.0 , 1.0 ) ) - getT( p + vec2( 0.0 , -1.0 ) ) );
 			}
 			float laplT( vec2 p )
 			{
-				return getT( p + vec2( 1.0 , 0.0 ) ) + getT( p + vec2( -1.0 , 0.0 ) )
-				+ getT( p + vec2( 0.0 , 1.0 ) ) + getT( p + vec2( 0.0 , -1.0 ) ) - getT( p ) * 4.0;
+				return ( getT( p + vec2( 1.0 , 0.0 ) ) + getT( p + vec2( -1.0 , 0.0 ) )
+				+ getT( p + vec2( 0.0 , 1.0 ) ) + getT( p + vec2( 0.0 , -1.0 ) ) - getT( p ) * 4.0 );
 			}
 			varying vec2 uv;
 			void main()
 			{
-				gl_FragColor = vec4( laplT( getPos( uv ) ) * 10.1 , vec3( 0.0 ) ) * dt +
+				gl_FragColor = vec4( laplT( getPos( uv ) ) , vec3( 0.0 ) ) * dt +
 				texture2D( texture , uv );
 			}
 		</script>
@@ -78,13 +86,13 @@ and open the template in the editor.
 			varying vec2 uv;
 			vec3 color( float x )
 			{
-				float t = x * 1.0e-3;
-				return mix( vec3( 0.0 , 0.1 , 0.5 )
-				, mix( vec3( 0.8 , 0.2 , 0.0 )
-					, mix( vec3( 0.99 , 0.6 , 0.0 )
-						, vec3( 1.0 , 1.0 , 1.0 )
-						, clamp( 4.0 * t - 3.0 , 0.0 , 1.0 ) )
-					, clamp( 2.0 * t - 1.0 , 0.0 , 1.0 ) )
+			float t = x * 1.0e-3;
+			return mix( vec3( 0.0 , 0.1 , 0.5 )
+				, mix( vec3( 0.9 , 0.2 , 0.0 )
+				, mix( vec3( 0.99 , 0.6 , 0.0 )
+				, vec3( 1.0 , 1.0 , 1.0 )
+				, clamp( 4.0 * t - 3.0 , 0.0 , 1.0 ) )
+				, clamp( 2.0 * t - 1.0 , 0.0 , 1.0 ) )
 				, clamp( 2.0 * t , 0.0 , 1.0 ) );
 			}
 			void main()
@@ -137,8 +145,8 @@ function initGL()
 		gl.viewportHeight = canvas.height;
 		canvas.onclick = function( e )
 		{
-			var mouseX = e.pageX - this.offsetLeft;
-			var mouseY = e.pageY - this.offsetTop;
+			var mouseX = e.pageX - canvas.offsetLeft;
+			var mouseY = e.pageY - canvas.offsetTop;
 			if( mouseX < gl.viewportWidth && mouseY < gl.viewportHeight )
 			{
 				temperature_point.x = mouseX / gl.viewportWidth;
@@ -211,14 +219,18 @@ function initGL()
 		}
 		var last_dt = 0.016;
 		var dt_sum = 0.0;
-		
+		var dt_k = 1.0;
+		$( "#dt_range" ).on( "change" , function(){
+			dt_k = this.value * 0.1;
+			console.log( this.value );
+		} );
 		setInterval( function()
 		{
 			gl.disable( gl.BLEND );
 			{
 				gl.bindTarget( fbuf[ tgr_buf ] );
 				gl.bindShader( proc_shader );
-				gl.uniform1f( proc_shader.getUniformLoc( "dt" ) , last_dt );
+				gl.uniform1f( proc_shader.getUniformLoc( "dt" ) , last_dt * dt_k );
 				gl.uniform2f( proc_shader.getUniformLoc( "viewport_size" ) , fbuf[ tgr_buf ].width , fbuf[ tgr_buf ].height );
 				proc_shader.bindTexture( fbuf[ proc_buf ].texid , "texture" );
 				fullscreen_quad.draw();
@@ -241,15 +253,15 @@ function initGL()
 			gl.bindShader( copy_shader );
 			copy_shader.bindTexture( fbuf[ proc_buf ].texid , 0 );
 			fullscreen_quad.draw();
-			
-			
+
+
 			gl.enable( gl.BLEND );
 			gl.blendFunc( gl.SRC_ALPHA , gl.ONE_MINUS_SRC_ALPHA );
 			gl.bindShader( point_shader );
 			gl.uniform2f( point_shader.getUniformLoc( "size" ) , 0.01 , 0.01 );
 			gl.uniform2f( point_shader.getUniformLoc( "pos" ) , 2.0 * temperature_point.x - 1 , 2.0 * temperature_point.y - 1 );
 			fullscreen_quad.draw();
-			
+
 			var cur_time = new Date().getTime() * 1.0e-3;
 			last_dt = ( cur_time - last_time );
 			last_time = cur_time;
@@ -396,7 +408,22 @@ function genFullScreenQuad()
 		</script>
 	</head>
 	<body onload="initGL();">
+		<nav>
+			<div class="nav-wrapper">
+				<a href="" class="brand-logo left">heat conduction solver</a>
+				<ul id="nav-mobile" class="right hide-on-med-and-down">
+					<li><a href="">reload</a></li>
+				</ul>
+
+			</div>
+		</nav>
 		<canvas id="main_canvas" width="512" height="512" ></canvas>
+
+
+
 		<div id="temperature_label"></div>
+		<p class="range-field">
+			<input type="range" id="dt_range" min="0" max="100" />
+		</p>
 	</body>
 </html>
