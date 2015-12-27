@@ -230,7 +230,8 @@ and open the template in the editor.
 				if( !al )
 					discard;
 				float z = texture2D( texture , wpos.xy * 0.5 + 0.5 ).x;
-				gl_FragColor = vec4( color( z ) , wpos.z < z / 1000.0 ? clamp( 0.5 + 0.5 * wpos.z , 0.0 , 1.0 ) : 0.0 );
+				float alpha = wpos.z < z / 1000.0 ? clamp( z * 0.001 - wpos.z , 0.0 , 1.0 ) : 0.0;
+				gl_FragColor = vec4( color( z ) , alpha );
 			}
 		</script>
 		<script id="point_frag" type="x-shader/x-fragment">
