@@ -174,8 +174,14 @@ var testFunc = function()
 				gl.uniform3fv( voxel_shader.getUniformLoc( "up" ) , new Float32Array( camera.up.toArr() ) );
 				gl.uniform3fv( voxel_shader.getUniformLoc( "left" ) , new Float32Array( camera.left.toArr() ) );
 				gl.uniform3fv( voxel_shader.getUniformLoc( "look" ) , new Float32Array( camera.look.toArr() ) );
-				for( var z = 1.5; z >= -1.6; z -= 0.01 )
+				var N = 1000;
+				var near = -1.5;
+				var far = 1.5;
+				for( var i = 0; i <= N; i++ )
 				{
+					var x = i / N;
+					var k = Math.pow( x , 0.5 );
+					var z = far * ( 1.0 - k ) + near * k;
 					gl.uniform1f( voxel_shader.getUniformLoc( "z" ) , z );
 					simple_quad.draw();
 				}
