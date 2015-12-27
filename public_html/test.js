@@ -131,8 +131,10 @@ var testFunc = function()
 
 	var grid = GridQuad( gl , 4 , 4 );
 	var quad = TessQuad( gl , 64 , 64 );
+	var simple_quad = TessQuad( gl , 1 , 1 );
 	var grid_shader = genShader( gl , "grid_frag" , "grid_vert" );
 	var plane_shader = genShader( gl , "plane_frag" , "plane_vert" );
+	var voxel_shader = genShader( gl , "voxel_frag" , "voxel_vert" );
 	var solver = new Solver();
 	window.addEventListener( 'keyup' , function( event )
 	{
@@ -151,7 +153,6 @@ var testFunc = function()
 		gl.enable( gl.DEPTH_TEST );
 		gl.depthFunc( gl.LEQUAL );
 		gl.enable( gl.BLEND );
-		gl.blendFunc( gl.ONE , gl.ONE_MINUS_SRC_ALPHA );
 		gl.bindTarget( null );
 		gl.clearTarget();
 		if( InputHandler.isDown( "S" ) )
@@ -164,11 +165,33 @@ var testFunc = function()
 			gl.bindShader( grid_shader );
 			gl.uniformMatrix4fv( grid_shader.getUniformLoc( "viewproj" ) , gl.GL_FALSE , new Float32Array( viewproj.m ) );
 			grid.draw();
+			
+			if( InputHandler.isDown( "W" ) )
+			{
+				gl.blendFunc( gl.SRC_ALPHA , gl.ONE_MINUS_SRC_ALPHA );
+				gl.bindShader( voxel_shader );
+				gl.uniformMatrix4fv( voxel_shader.getUniformLoc( "viewproj" ) , gl.GL_FALSE , new Float32Array( viewproj.m ) );
+				gl.uniform3fv( voxel_shader.getUniformLoc( "up" ) , new Float32Array( camera.up.toArr() ) );
+				gl.uniform3fv( voxel_shader.getUniformLoc( "left" ) , new Float32Array( camera.left.toArr() ) );
+				gl.uniform3fv( voxel_shader.getUniformLoc( "look" ) , new Float32Array( camera.look.toArr() ) );
+				for( var z = 1.5; z >= -1.6; z -= 0.01 )
+				{
+					gl.uniform1f( voxel_shader.getUniformLoc( "z" ) , z );
+					simple_quad.draw();
+				}
+			} else
+			{
+				gl.bindShader( plane_shader );
+				plane_shader.bindTexture( texid , "texture" );
+				gl.uniform1i( plane_shader.getUniformLoc( "fill" ) , 0 );
+				gl.uniformMatrix4fv( plane_shader.getUniformLoc( "viewproj" ) , gl.GL_FALSE , new Float32Array( viewproj.m ) );
+				quad.draw();
+			}
+			gl.disable( gl.DEPTH_TEST );
 			gl.bindShader( plane_shader );
 			plane_shader.bindTexture( texid , "texture" );
-			gl.uniform1i( plane_shader.getUniformLoc( "fill" ) , 0 );
 			gl.uniformMatrix4fv( plane_shader.getUniformLoc( "viewproj" ) , gl.GL_FALSE , new Float32Array( viewproj.m ) );
-			quad.draw();
+			gl.blendFunc( gl.ONE , gl.ONE_MINUS_SRC_ALPHA );
 			gl.uniform1i( plane_shader.getUniformLoc( "fill" ) , 1 );
 			quad.draw( true );
 		}
