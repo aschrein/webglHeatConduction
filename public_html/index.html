@@ -180,7 +180,7 @@ and open the template in the editor.
 					gl_FragColor = vec4( color( texture2D( texture , uv ).x ) , 1.0 );
 				} else
 				{
-					gl_FragColor = vec4( 0.0 , 0.0 , 0.0 , 0.5 );
+					gl_FragColor = vec4( 0.0 , 0.0 , 0.0 , 0.1 );
 				}
 			}
 		</script>
@@ -207,10 +207,10 @@ and open the template in the editor.
 			uniform sampler2D texture;
 			vec3 color( float x )
 			{
-				/*if( 0.01 * x - floor( 0.01 * x ) < 0.5 )
+				if( 0.01 * x - floor( 0.01 * x ) < 0.5 )
 				{
 					return vec3( 0.0 );
-				}*/
+				}
 				float t = x * 1.0e-3;
 				return mix( vec3( 0.0 , 0.1 , 0.5 )
 					, mix( vec3( 0.9 , 0.2 , 0.0 )
@@ -230,8 +230,8 @@ and open the template in the editor.
 				if( !al )
 					discard;
 				float z = texture2D( texture , wpos.xy * 0.5 + 0.5 ).x;
-				float alpha = wpos.z < z / 1000.0 ? clamp( ( z * 0.001 - wpos.z ) * 0.01 , 0.0 , 1.0 ) : 0.0;
-				gl_FragColor = vec4( color( z ) , alpha );
+				float alpha = wpos.z < z / 1000.0 ? clamp( wpos.z + 0.5 , 0.0 , 1.0 ) : 0.0;
+				gl_FragColor = vec4( color( z ) * alpha , 1.0 );
 			}
 		</script>
 		<script id="point_frag" type="x-shader/x-fragment">
