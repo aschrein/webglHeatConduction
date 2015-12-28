@@ -100,7 +100,7 @@ function Solver()
 	$( "#border_frag" ).on( "change keyup paste" , function()
 	{
 		var currentVal = $( this ).val();
-		document.getElementById('border_frag').innerHTML = currentVal;
+		document.getElementById( 'border_frag' ).innerHTML = currentVal;
 	} );
 	this.reloadBorder = function()
 	{
@@ -222,14 +222,15 @@ var testFunc = function()
 				gl.uniform1i( plane_shader.getUniformLoc( "fill" ) , 0 );
 				gl.uniformMatrix4fv( plane_shader.getUniformLoc( "viewproj" ) , gl.GL_FALSE , new Float32Array( viewproj.m ) );
 				quad.draw();
+				gl.disable( gl.DEPTH_TEST );
+				gl.bindShader( plane_shader );
+				plane_shader.bindTexture( texid , "texture" );
+				gl.uniformMatrix4fv( plane_shader.getUniformLoc( "viewproj" ) , gl.GL_FALSE , new Float32Array( viewproj.m ) );
+				gl.blendFunc( gl.ONE , gl.ONE_MINUS_SRC_ALPHA );
+				gl.uniform1i( plane_shader.getUniformLoc( "fill" ) , 1 );
+				quad.draw( true );
 			}
-			gl.disable( gl.DEPTH_TEST );
-			gl.bindShader( plane_shader );
-			plane_shader.bindTexture( texid , "texture" );
-			gl.uniformMatrix4fv( plane_shader.getUniformLoc( "viewproj" ) , gl.GL_FALSE , new Float32Array( viewproj.m ) );
-			gl.blendFunc( gl.ONE , gl.ONE_MINUS_SRC_ALPHA );
-			gl.uniform1i( plane_shader.getUniformLoc( "fill" ) , 1 );
-			quad.draw( true );
+
 		}
 	} , 16 );
 };
