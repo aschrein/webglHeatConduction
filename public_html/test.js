@@ -97,24 +97,23 @@ function Solver()
 		 this.frame_counter++;*/
 		return this.fbuf[ this.proc_buf ].texid;
 	};
-	$( "#border_frag" ).on( "change keyup paste" , function()
-	{
-		var currentVal = $( this ).val();
-		document.getElementById( 'border_frag' ).innerHTML = currentVal;
-	} );
 	this.reloadBorder = function()
 	{
-		gl.bindShader( this.fill_shader );
+		var nsh = genShader( gl , "border_frag" , "simple_vert" );
+		if( nsh )
+		{
+			gl.bindShader( this.fill_shader );
 
-		gl.bindTarget( this.fbuf[ this.tgr_buf ] );
-		gl.clearTarget();
-		this.fullscreen_quad.draw();
+			gl.bindTarget( this.fbuf[ this.tgr_buf ] );
+			gl.clearTarget();
+			this.fullscreen_quad.draw();
 
-		gl.bindTarget( this.fbuf[ this.proc_buf ] );
-		gl.clearTarget();
-		this.fullscreen_quad.draw();
-
-		this.border_shader = genShader( gl , "border_frag" , "simple_vert" );
+			gl.bindTarget( this.fbuf[ this.proc_buf ] );
+			gl.clearTarget();
+			this.fullscreen_quad.draw();
+			this.border_shader.release();
+			this.border_shader = nsh;
+		}
 	};
 }
 var solver;
@@ -125,7 +124,7 @@ function reload()
 var testFunc = function()
 {
 	var canvas = document.getElementById( "main_canvas" );
-
+	
 	canvas.addEventListener( 'mousedown' , function( e )
 	{
 		mouseposx = e.pageX;
@@ -164,6 +163,12 @@ var testFunc = function()
 	var plane_shader = genShader( gl , "plane_frag" , "plane_vert" );
 	var voxel_shader = genShader( gl , "voxel_frag" , "voxel_vert" );
 	solver = new Solver();
+	$( "#border_frag" ).on( "change keyup paste" , function()
+	{
+		var currentVal = $( this ).val();
+		document.getElementById( 'border_frag' ).innerHTML = currentVal;
+		solver.reloadBorder();
+	} );
 	window.addEventListener( 'keyup' , function( event )
 	{
 		InputHandler.onKeyup( event );

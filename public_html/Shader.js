@@ -3,8 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
+var shader_logger = null;
 function genShader( gl , fragment_id , vertex_id ){
+	shader_logger = shader_logger || document.getElementById( "shader_log" );
 	function getSubShader( gl , id ){
 		var shaderScript = document.getElementById( id );
 		if( !shaderScript ){
@@ -33,21 +34,32 @@ function genShader( gl , fragment_id , vertex_id ){
 		gl.compileShader( shader );
 
 		if( !gl.getShaderParameter( shader , gl.COMPILE_STATUS ) ){
-			alert( gl.getShaderInfoLog( shader ) );
+			//alert( gl.getShaderInfoLog( shader ) );
 			return null;
 		}
 		return shader;
 	}
-	var fragmentShader = getSubShader( gl , fragment_id );
-	var vertexShader = getSubShader( gl , vertex_id );
+	
 
 	var out = gl.createProgram();
-	gl.attachShader( out , vertexShader );
-	gl.attachShader( out , fragmentShader );
+	out.fragmentShader = getSubShader( gl , fragment_id );
+	out.vertexShader = getSubShader( gl , vertex_id );
+	gl.attachShader( out , out.vertexShader );
+	gl.attachShader( out , out.fragmentShader );
 	gl.linkProgram( out );
 
+	out.release = function()
+	{
+		gl.deleteShader( out.fragmentShader );
+		gl.deleteShader( out.vertexShader );
+		gl.deleteProgram( out );
+		
+	};
 	if( !gl.getProgramParameter( out , gl.LINK_STATUS ) ){
-		alert( "Could not initialise shaders:" + fragment_id + ", " + vertex_id );
+		out.release();
+		//alert( "Could not initialise shaders:" + fragment_id + ", " + vertex_id );
+		shader_logger.innerHTML = "Could not initialise shaders:" + fragment_id + ", " + vertex_id;
+		return null;
 	}
 	out.texture_samplers_count = 0;
 	out.resetSamplers = function()
@@ -74,6 +86,7 @@ function genShader( gl , fragment_id , vertex_id ){
 		gl.uniform1i( out.uniformMap[ name ] , out.texture_samplers_count );
 		out.texture_samplers_count += 1;
 	};
+	
 	return out;
 	//shaderProgram.vertexPositionAttribute = gl.getAttribLocation( shaderProgram , "aVertexPosition" );
 	//gl.enableVertexAttribArray( shaderProgram.vertexPositionAttribute );

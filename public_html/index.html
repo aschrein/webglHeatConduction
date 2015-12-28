@@ -10,6 +10,7 @@ and open the template in the editor.
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+		
 		<script src="vec3.js"></script>
 		<script src="vec4.js"></script>
 		<script src="Mat4.js"></script>
@@ -249,6 +250,7 @@ and open the template in the editor.
 
 		<b>W-render volume , S-render isolines</b>
 		<canvas id="main_canvas" width="512" height="512" ></canvas>
+		
 		<textarea rows="30" cols="120" id="border_frag" class="x-shader/x-fragment">
 precision highp float;
 uniform sampler2D texture;
@@ -276,6 +278,7 @@ void main()
 	}
 }
 		</textarea>
+		<b id="shader_log"></b>
 		<button type="button" onClick="reload();">load shader</button>
 
 		<div id="temperature_label"></div>
