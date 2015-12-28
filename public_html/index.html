@@ -25,36 +25,9 @@ and open the template in the editor.
 			varying vec2 uv;
 			void main()
 			{
-				float l = length( uv - 0.5 ) * 2.0;
-				float x = 10.0 * ( uv.y * uv.x - 0.5 );
-				gl_FragColor = vec4( 0.0 );//1000.0 * exp( -pow( abs( x ) , 2.0 ) ) , 0.0 , 0.0 , 1.0 );
-			}
-		</script>
-		<script id="border_frag" type="x-shader/x-fragment">
-			precision highp float;
-			uniform sampler2D texture;
-			uniform vec2 viewport_size;
-			varying vec2 uv;
-			void main()
-			{
-				vec2 border_width = vec2( 1.0 ) / viewport_size;
-				vec2 tx = uv - 0.5;
-				bool b = length( tx ) > 0.48;//0.5 - abs( uv.x - 0.5 ) <= border_width.x || 0.5 - abs( uv.y - 0.5 ) <= border_width.y;
-				
-				if( b )
-				{
-					gl_FragColor = vec4( 500.0 * ( 1.0 + cos( atan( tx.y , tx.x ) ) ) , 0.0 , 0.0 , 1.0 );
-				} else
-				{
-					/*b = length( tx ) < 0.3;
-					if( b )
-					{
-						gl_FragColor = vec4( 500.0 * ( 1.0 + cos( 1.4 + atan( tx.y , tx.x ) ) ) , 0.0 , 0.0 , 1.0 );
-					} else*/
-					{
-						gl_FragColor = texture2D( texture , uv );
-					}
-				}
+			float l = length( uv - 0.5 ) * 2.0;
+			float x = 10.0 * ( uv.y * uv.x - 0.5 );
+			gl_FragColor = vec4( 0.0 );//1000.0 * exp( -pow( abs( x ) , 2.0 ) ) , 0.0 , 0.0 , 1.0 );
 			}
 		</script>
 		<script id="proc_frag" type="x-shader/x-fragment">
@@ -64,31 +37,31 @@ and open the template in the editor.
 			uniform sampler2D texture;
 			vec2 getUV( vec2 p )
 			{
-				return p / viewport_size;
+			return p / viewport_size;
 			}
 			vec2 getPos( vec2 uv )
 			{
-				return uv * viewport_size;
+			return uv * viewport_size;
 			}
 			float getT( vec2 p )
 			{
-				return texture2D( texture , getUV( p ) ).x;
+			return texture2D( texture , getUV( p ) ).x;
 			}
 			vec2 gradT( vec2 p )
 			{
-				return vec2( getT( p + vec2( 1.0 , 0.0 ) ) - getT( p + vec2( -1.0 , 0.0 ) ) ,
-				getT( p + vec2( 0.0 , 1.0 ) ) - getT( p + vec2( 0.0 , -1.0 ) ) );
+			return vec2( getT( p + vec2( 1.0 , 0.0 ) ) - getT( p + vec2( -1.0 , 0.0 ) ) ,
+			getT( p + vec2( 0.0 , 1.0 ) ) - getT( p + vec2( 0.0 , -1.0 ) ) );
 			}
 			float laplT( vec2 p )
 			{
-				return ( getT( p + vec2( 1.0 , 0.0 ) ) + getT( p + vec2( -1.0 , 0.0 ) )
-				+ getT( p + vec2( 0.0 , 1.0 ) ) + getT( p + vec2( 0.0 , -1.0 ) ) - getT( p ) * 4.0 );
+			return ( getT( p + vec2( 1.0 , 0.0 ) ) + getT( p + vec2( -1.0 , 0.0 ) )
+			+ getT( p + vec2( 0.0 , 1.0 ) ) + getT( p + vec2( 0.0 , -1.0 ) ) - getT( p ) * 4.0 );
 			}
 			varying vec2 uv;
 			void main()
 			{
-				gl_FragColor = vec4( laplT( getPos( uv ) ) , vec3( 0.0 ) ) * dt +
-				texture2D( texture , uv );
+			gl_FragColor = vec4( laplT( getPos( uv ) ) , vec3( 0.0 ) ) * dt +
+			texture2D( texture , uv );
 			}
 		</script>
 		<script id="copy_frag" type="x-shader/x-fragment">
@@ -97,22 +70,22 @@ and open the template in the editor.
 			varying vec2 uv;
 			vec3 color( float x )
 			{
-				if( 0.01 * x - floor( 0.01 * x ) < 0.5 )
-				{
-					return vec3( 0.0 );
-				}
-				float t = x * 1.0e-3;
-				return mix( vec3( 0.0 , 0.1 , 0.5 )
-					, mix( vec3( 0.9 , 0.2 , 0.0 )
-					, mix( vec3( 0.99 , 0.6 , 0.0 )
-					, vec3( 1.0 , 1.0 , 1.0 )
-					, clamp( 4.0 * t - 3.0 , 0.0 , 1.0 ) )
-					, clamp( 2.0 * t - 1.0 , 0.0 , 1.0 ) )
-					, clamp( 2.0 * t , 0.0 , 1.0 ) );
+			if( 0.01 * x - floor( 0.01 * x ) < 0.5 )
+			{
+			return vec3( 0.0 );
+			}
+			float t = x * 1.0e-3;
+			return mix( vec3( 0.0 , 0.1 , 0.5 )
+			, mix( vec3( 0.9 , 0.2 , 0.0 )
+			, mix( vec3( 0.99 , 0.6 , 0.0 )
+			, vec3( 1.0 , 1.0 , 1.0 )
+			, clamp( 4.0 * t - 3.0 , 0.0 , 1.0 ) )
+			, clamp( 2.0 * t - 1.0 , 0.0 , 1.0 ) )
+			, clamp( 2.0 * t , 0.0 , 1.0 ) );
 			}
 			void main()
 			{
-				gl_FragColor = vec4( color( texture2D( texture , uv ).x ) , 1.0 );
+			gl_FragColor = vec4( color( texture2D( texture , uv ).x ) , 1.0 );
 			}
 		</script>
 		<script id="simple_vert" type="x-shader/x-vertex">
@@ -120,8 +93,8 @@ and open the template in the editor.
 			varying vec2 uv;
 			void main()
 			{
-				uv = 0.5 * vertex_pos.xy + 0.5;
-				gl_Position = vec4( vertex_pos , 1.0 );
+			uv = 0.5 * vertex_pos.xy + 0.5;
+			gl_Position = vec4( vertex_pos , 1.0 );
 			}
 		</script>
 		<script id="grid_vert" type="x-shader/x-vertex">
@@ -130,8 +103,8 @@ and open the template in the editor.
 			varying vec2 uv;
 			void main()
 			{
-				uv = 0.5 * vertex_pos.xy + 0.5;
-				gl_Position = vec4( vertex_pos , 1.0 ) * viewproj;
+			uv = 0.5 * vertex_pos.xy + 0.5;
+			gl_Position = vec4( vertex_pos , 1.0 ) * viewproj;
 			}
 		</script>
 		<script id="plane_vert" type="x-shader/x-vertex">
@@ -141,8 +114,8 @@ and open the template in the editor.
 			varying vec2 uv;
 			void main()
 			{
-				uv = 0.5 * vertex_pos.xy + 0.5;
-				gl_Position =  vec4( vertex_pos.xy , texture2D( texture , uv ).x * 0.001 , 1.0 ) * viewproj;
+			uv = 0.5 * vertex_pos.xy + 0.5;
+			gl_Position =  vec4( vertex_pos.xy , texture2D( texture , uv ).x * 0.001 , 1.0 ) * viewproj;
 			}
 		</script>
 		<script id="grid_frag" type="x-shader/x-fragment">
@@ -150,7 +123,7 @@ and open the template in the editor.
 			varying vec2 uv;
 			void main()
 			{
-				gl_FragColor = vec4( 1.0 );
+			gl_FragColor = vec4( 1.0 );
 			}
 		</script>
 		<script id="plane_frag" type="x-shader/x-fragment">
@@ -187,18 +160,18 @@ and open the template in the editor.
 		<script id="voxel_vert" type="x-shader/x-vertex">
 			attribute vec3 vertex_pos;
 			uniform mat4 viewproj;
-			
+
 			uniform vec3 up;
 			uniform vec3 left;
 			uniform vec3 look;
 			uniform float z;
 			varying vec3 wpos;
-			
+
 			void main()
 			{
-				//uv = 0.5 * vertex_pos.xy + 0.5;
-				wpos = 2.0 * vertex_pos.x * left + 2.0 * vertex_pos.y * up + look * z;
-				gl_Position =  vec4( wpos , 1.0 ) * viewproj;
+			//uv = 0.5 * vertex_pos.xy + 0.5;
+			wpos = 2.0 * vertex_pos.x * left + 2.0 * vertex_pos.y * up + look * z;
+			gl_Position =  vec4( wpos , 1.0 ) * viewproj;
 			}
 		</script>
 		<script id="voxel_frag" type="x-shader/x-fragment">
@@ -239,7 +212,7 @@ and open the template in the editor.
 			varying vec2 uv;
 			void main()
 			{
-				gl_FragColor = length( uv - 0.5 ) < 0.5 ? vec4( vec3( 0.0 ) , 1.0 ) : vec4( 0.0 , 0.0 , 0.0 , 0.0 );
+			gl_FragColor = length( uv - 0.5 ) < 0.5 ? vec4( vec3( 0.0 ) , 1.0 ) : vec4( 0.0 , 0.0 , 0.0 , 0.0 );
 			}
 		</script>
 		<script id="point_vert" type="x-shader/x-vertex">
@@ -249,11 +222,18 @@ and open the template in the editor.
 			varying vec2 uv;
 			void main()
 			{
-				uv = 0.5 * vertex_pos.xy + 0.5;
-				gl_Position = vec4( pos + size * vertex_pos.xy , -0.01 , 1.0 );
+			uv = 0.5 * vertex_pos.xy + 0.5;
+			gl_Position = vec4( pos + size * vertex_pos.xy , -0.01 , 1.0 );
 			}
 		</script>
-		
+		<style>
+			textarea  
+			{  
+				font-family:"Times New Roman", Times, serif;  
+				font-size: 12px;   
+			}
+
+		</style>
 	</head>
 	<body onload="testFunc();">
 		<nav>
@@ -265,10 +245,37 @@ and open the template in the editor.
 
 			</div>
 		</nav>
+
 		<b>W-render volume , S-render isolines</b>
 		<canvas id="main_canvas" width="512" height="512" ></canvas>
+		<textarea rows="30" cols="120" id="border_frag" class="x-shader/x-fragment">
+precision highp float;
+uniform sampler2D texture;
+uniform vec2 viewport_size;
+varying vec2 uv;
+void main()
+{
+	vec2 border_width = vec2( 1.0 ) / viewport_size;
+	vec2 tx = uv - 0.5;
+	bool b = length( tx ) > 0.48;//0.5 - abs( uv.x - 0.5 ) <= border_width.x || 0.5 - abs( uv.y - 0.5 ) <= border_width.y;
 
-
+	if( b )
+	{
+		gl_FragColor = vec4( 500.0 * ( 1.0 + cos( atan( tx.y , tx.x ) ) ) , 0.0 , 0.0 , 1.0 );
+	} else
+	{
+		/*b = length( tx ) < 0.3;
+		if( b )
+		{
+			gl_FragColor = vec4( 500.0 * ( 1.0 + cos( 1.4 + atan( tx.y , tx.x ) ) ) , 0.0 , 0.0 , 1.0 );
+		} else*/
+		{
+			gl_FragColor = texture2D( texture , uv );
+		}
+	}
+}
+		</textarea>
+		<button type="button" onClick="reload();">load shader</button>
 
 		<div id="temperature_label"></div>
 		<p class="range-field">

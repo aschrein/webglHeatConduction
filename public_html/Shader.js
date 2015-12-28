@@ -19,9 +19,12 @@ function genShader( gl , fragment_id , vertex_id ){
 			k = k.nextSibling;
 		}
 		var shader;
-		if( shaderScript.type === "x-shader/x-fragment" ){
+		var type = id;//"" + ( shaderScript.type ? shaderScript.type : id );
+		if( type.indexOf( "frag" ) >- 1 )// === "x-shader/x-fragment" ){
+		{
 			shader = gl.createShader( gl.FRAGMENT_SHADER );
-		} else if( shaderScript.type === "x-shader/x-vertex" ){
+		} else if( type.indexOf( "vert" ) >- 1 )// === "x-shader/x-vertex" )
+		{
 			shader = gl.createShader( gl.VERTEX_SHADER );
 		} else{
 			return null;

@@ -28,33 +28,7 @@ var mouseposx = 0;
 var mouseposy = 0;
 var drag = false;
 var viewproj;
-window.addEventListener( 'mousedown' , function( e )
-{
-	mouseposx = e.pageX;
-	mouseposy = e.pageY;
-	drag = true;
-} , false );
-window.addEventListener( 'mouseup' , function( e )
-{
-	drag = false;
-} , false );
-var recalcMatrix = function()
-{
-	viewproj = camera.getMatrix();
-};
-window.addEventListener( 'mousemove' , function( e )
-{
-	if( !drag )
-		return;
-	phi -= ( e.pageX - mouseposx ) * 0.01;
-	theta -= ( e.pageY - mouseposy ) * 0.01;
-	//phi = phi > 3.14 ? 3.14 : phi < -3.14 ? -3.14 : phi;
-	theta = theta > 3.13 ? 3.13 : theta < 0.01 ? 0.01 : theta;
-	mouseposx = e.pageX;
-	mouseposy = e.pageY;
-	camera = getLookAt( new Float3( Math.sin( theta ) * Math.cos( phi ) , Math.sin( theta ) * Math.sin( phi ) , Math.cos( theta ) ).mul( 1.0 ) , new Float3( 0.0 , 0.0 , 0.0 ) , new Float3( 0.0 , 0.0 , 1.0 ) , 0.8 , 0.8 );
-	recalcMatrix();
-} , false );
+
 function Solver()
 {
 	this.fbuf = [ genFrameBuffer( gl , 128 , 128 , null ) , genFrameBuffer( gl , 128 , 128 , null ) ];
@@ -123,10 +97,64 @@ function Solver()
 		 this.frame_counter++;*/
 		return this.fbuf[ this.proc_buf ].texid;
 	};
+	$( "#border_frag" ).on( "change keyup paste" , function()
+	{
+		var currentVal = $( this ).val();
+		document.getElementById('border_frag').innerHTML = currentVal;
+	} );
+	this.reloadBorder = function()
+	{
+		gl.bindShader( this.fill_shader );
+
+		gl.bindTarget( this.fbuf[ this.tgr_buf ] );
+		gl.clearTarget();
+		this.fullscreen_quad.draw();
+
+		gl.bindTarget( this.fbuf[ this.proc_buf ] );
+		gl.clearTarget();
+		this.fullscreen_quad.draw();
+
+		this.border_shader = genShader( gl , "border_frag" , "simple_vert" );
+	};
+}
+var solver;
+function reload()
+{
+	solver.reloadBorder();
 }
 var testFunc = function()
 {
 	var canvas = document.getElementById( "main_canvas" );
+
+	canvas.addEventListener( 'mousedown' , function( e )
+	{
+		mouseposx = e.pageX;
+		mouseposy = e.pageY;
+		drag = true;
+	} , false );
+	canvas.addEventListener( 'mouseup' , function( e )
+	{
+		drag = false;
+	} , false );
+	var recalcMatrix = function()
+	{
+		viewproj = camera.getMatrix();
+	};
+	canvas.addEventListener( 'mousemove' , function( e )
+	{
+		if( !drag )
+			return;
+		phi -= ( e.pageX - mouseposx ) * 0.01;
+		theta -= ( e.pageY - mouseposy ) * 0.01;
+		//phi = phi > 3.14 ? 3.14 : phi < -3.14 ? -3.14 : phi;
+		theta = theta > 3.13 ? 3.13 : theta < 0.01 ? 0.01 : theta;
+		mouseposx = e.pageX;
+		mouseposy = e.pageY;
+		camera = getLookAt( new Float3( Math.sin( theta ) * Math.cos( phi ) , Math.sin( theta ) * Math.sin( phi ) , Math.cos( theta ) ).mul( 1.0 ) , new Float3( 0.0 , 0.0 , 0.0 ) , new Float3( 0.0 , 0.0 , 1.0 ) , 0.8 , 0.8 );
+		recalcMatrix();
+	} , false );
+
+
 	gl = createGLContext( canvas );
 
 	var grid = GridQuad( gl , 4 , 4 );
@@ -135,7 +163,7 @@ var testFunc = function()
 	var grid_shader = genShader( gl , "grid_frag" , "grid_vert" );
 	var plane_shader = genShader( gl , "plane_frag" , "plane_vert" );
 	var voxel_shader = genShader( gl , "voxel_frag" , "voxel_vert" );
-	var solver = new Solver();
+	solver = new Solver();
 	window.addEventListener( 'keyup' , function( event )
 	{
 		InputHandler.onKeyup( event );
