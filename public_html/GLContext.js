@@ -29,7 +29,7 @@ function createGLContext( canvas )
 				}
 			}
 		};
-		gl.clear_color = { r : 0.0 , g : 0.0 , b : 0.0 };
+		gl.clear_color = { r : 0.5 , g : 0.5 , b : 0.5 };
 		gl.clearTarget = function()
 		{
 			gl.clearColor( gl.clear_color.r , gl.clear_color.g , gl.clear_color.b , 1.0 );
