@@ -198,7 +198,7 @@ var testFunc = function()
 			{
 				//gl.blendEquationSeparate( gl.FUNC_ADD , gl.FUNC_ADD );
 				//gl.blendFuncSeparate( gl.SRC_ALPHA , gl.ONE_MINUS_SRC_ALPHA , gl.ONE , gl.ZERO );
-				gl.blendFunc( gl.SRC_COLOR , gl.ONE_MINUS_SRC_COLOR );
+				gl.blendFunc( gl.SRC_ALPHA , gl.ONE_MINUS_SRC_ALPHA );
 				gl.bindShader( voxel_shader );
 				gl.uniformMatrix4fv( voxel_shader.getUniformLoc( "viewproj" ) , gl.GL_FALSE , new Float32Array( viewproj.m ) );
 				gl.uniform3fv( voxel_shader.getUniformLoc( "up" ) , new Float32Array( camera.up.toArr() ) );
